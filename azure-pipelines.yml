@@ -5,5 +5,5 @@ steps:
     hostname: 'nexploit.app'
     module: 'dast'
     discoveryTypes: 'crawler'
-    crawlerUrls: ''
+    crawlerUrls: 'https://brokencrystals.com/api/products'
     scanTests: 'angular_csti,jwt,date_manipulation,cookie_security,csrf,directory_listing,dom_xss,file_upload,full_path_disclosure,header_security,http_method_fuzzing,secret_tokens,version_control_systems,wordpress'
