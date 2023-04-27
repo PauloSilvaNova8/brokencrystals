@@ -2,7 +2,7 @@ steps:
 - task: NexPloitScan@3
   inputs:
     apiToken: 'w0kajfx.nexa.e2vkg66ovl2mxdqb0mheziwkme173u8r'
-    hostname: 'nexploit.app'
+    hostname: 'app.brightsec.com'
     module: 'dast'
     discoveryTypes: 'crawler'
     crawlerUrls: 'https://brokencrystals.com'
