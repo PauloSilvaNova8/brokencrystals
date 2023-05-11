@@ -1,9 +1,36 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- repeater
+
+pool:
+  vmImage: 'ubuntu-latest'
+strategy:
+  matrix:
+    node_12_x:
+      node_version: 12.x
+
 steps:
-- task: NexPloitScan@3
+- task: NodeTool@0 
   inputs:
-    apiToken: 'w0kajfx.nexa.e2vkg66ovl2mxdqb0mheziwkme173u8r'
-    hostname: 'app.brightsec.com'
-    module: 'dast'
-    discoveryTypes: 'crawler'
-    crawlerUrls: 'https://brokencrystals.com'
-    scanTests: 'angular_csti,jwt,date_manipulation,cookie_security,csrf,directory_listing,dom_xss,file_upload,full_path_disclosure,header_security,http_method_fuzzing,secret_tokens,version_control_systems,wordpress'
+    versionSpec: $(node_version)
+
+- script: |
+    npm install
+    npm install @neuralegion/nexploit-cli -g || true
+      echo "Start NeuraLegion Scan 🏁"
+      SCAN_ID=$(nexploit-cli scan:run --token 0rj7lk5.nexp.y6gvap8nci3b3av7u100xtmhzjqukxym  --name "Azure BC Scan from Cloud, Scan 1" --crawler https://brokencrystals.com/  --smart  --test csrf unvalidated_redirect http_method_fuzzing insecure_tls_configuration dom_xss xss full_path_disclosure open_buckets --project 8CfRYa9XVCjNEHVN4kif5N --auth vioH8ACmXmGxkvcm3NFwZq --cluster app.brightsec.com)
+      echo "Scan was started with ID https://app.neuralegion.com/scans/$SCAN_ID"
+      sleep 10
+      echo "Wait for issues ⏳\n"
+      RESULT=$(nexploit-cli scan:polling --interval 30s --timeout 20m --token 0rj7lk5.nexp.y6gvap8nci3b3av7u100xtmhzjqukxym --breakpoint high_issue $SCAN_ID --cluster app.brightsec.com)
+      if [ -z "$RESULT" ]
+      then
+          echo "No need to stop scan"
+      else
+          echo "Stop Scan 🛑"
+          nexploit-cli scan:stop --token 0rj7lk5.nexp.y6gvap8nci3b3av7u100xtmhzjqukxym $SCAN_ID --cluster app.brightsec.com
+      fi
